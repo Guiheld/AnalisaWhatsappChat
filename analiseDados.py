@@ -63,3 +63,27 @@ def histograma(df):
     plt.show()
     print("Data Frame gerado para o grafico:")
     print(mensagens_por_dia)
+
+def grafico_pizza(df):
+    mensagens_por_remetente = df['remetente'].value_counts()
+
+    plt.figure(figsize=(8, 8))
+    plt.pie(mensagens_por_remetente, labels=mensagens_por_remetente.index, autopct='%1.1f%%', startangle=90, colors=plt.cm.Paired.colors)
+    plt.title("Percentual de Mensagens por Remetente")
+    plt.axis('equal')  # Para garantir que o gráfico seja um círculo
+    plt.show()
+
+def grafico_linha(df):
+    mensagens_por_dia = df.groupby([df['data'].dt.date, 'remetente']).size().unstack(fill_value=0)
+
+    plt.figure(figsize=(10, 6))
+    for remetente in mensagens_por_dia.columns:
+        plt.plot(mensagens_por_dia.index, mensagens_por_dia[remetente], label=remetente)
+
+    plt.xlabel('Data')
+    plt.ylabel('Quantidade de Mensagens')
+    plt.title('Quantidade de Mensagens por Dia para Cada Remetente')
+    plt.xticks(rotation=45)
+    plt.legend(title='Remetente', loc='upper left')
+    plt.tight_layout()
+    plt.show()
