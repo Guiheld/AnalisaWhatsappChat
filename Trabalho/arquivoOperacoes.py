@@ -1,6 +1,7 @@
 import logging
 import os
 import shutil
+from datetime import datetime
 from logging import exception
 import pandas as pd
 
@@ -38,15 +39,18 @@ def copiar_arquivo(PATH_PROJETO, PATH_BACKUP, PATH_TXT):
 
 def gerenciar_backup(PATH_PROJETO, PATH_BACKUP):
     arquivoAntigo = os.path.join(PATH_PROJETO, "_chat.txt")
-    if os.path.isfile(arquivoAntigo): #outro arquivo de chat dentro do projeto
-        if os.path.exists(PATH_BACKUP): #existe dir de backup
-            shutil.copy(arquivoAntigo, PATH_BACKUP) #faz backup
-            os.remove(arquivoAntigo)
-        else: #cria outro
-            logging.error("diretorio de backup de conversas nao existe, outro foi criado")
+    if os.path.isfile(arquivoAntigo):
+        if not os.path.exists(PATH_BACKUP):
+            logging.warning("Diretório de backup de conversas não existe. Criando novo diretório.")
             os.makedirs(PATH_BACKUP)
-            shutil.copy(arquivoAntigo, PATH_BACKUP)  # faz backup
+        # Gerar um nome de arquivo único com timestamp
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        arquivoBackup = os.path.join(PATH_BACKUP, f"_chat_backup_{timestamp}.txt")
+        try:
+            shutil.copy(arquivoAntigo, arquivoBackup)
             os.remove(arquivoAntigo)
+        except Exception as e:
+            logging.error(f"Erro ao criar o backup ou remover o arquivo original: {e}")
 
 def ler_txt(PATH_PROJETO, PATH_TXT):
     try:
